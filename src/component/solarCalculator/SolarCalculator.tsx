@@ -115,58 +115,95 @@ const SolarCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-normal text-gray-700">Add your preferred devices</h1>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
+          <h1 className="text-xl sm:text-2xl font-normal text-gray-700">Add your preferred devices</h1>
           <div className="text-right">
-            <div className="text-gray-600 text-sm">Total Watts:</div>
-            <div className="text-4xl font-semibold text-gray-900">{calculateTotal()} Watts</div>
+            <div className="text-gray-600 text-xs sm:text-sm">Total Watts:</div>
+            <div className="text-3xl sm:text-4xl font-semibold text-gray-900">{calculateTotal()} Watts</div>
           </div>
         </div>
 
-        <table className="w-full border-collapse mb-6">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="border border-gray-300 px-6 py-4 text-left text-gray-600 font-medium">Device</th>
-              <th className="border border-gray-300 px-6 py-4 text-center text-gray-600 font-medium">Usage per device</th>
-              <th className="border border-gray-300 px-6 py-4 text-center text-gray-600 font-medium">Quantity</th>
-              <th className="border border-gray-300 px-6 py-4 text-center text-gray-600 font-medium">Total</th>
-            </tr>
-          </thead>
-          <tbody>
+        {/* Responsive Table */}
+        <div className="w-full mb-6">
+          <table className="hidden md:table w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-left text-gray-600 font-medium">Device</th>
+                <th className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-center text-gray-600 font-medium">Usage per device</th>
+                <th className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-center text-gray-600 font-medium">Quantity</th>
+                <th className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-center text-gray-600 font-medium">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {devices.map(device => (
+                <tr key={device.id} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-gray-700">{device.name}</td>
+                  <td className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-center text-gray-700">{device.watts}W</td>
+                  <td className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4">
+                    <div className="flex items-center justify-center gap-2 sm:gap-4">
+                      <button
+                        onClick={() => updateQuantity(device.id, -1)}
+                        className="text-gray-600 hover:text-gray-800 bg-gray-200 rounded-sm cursor-pointer w-8 h-8 flex items-center justify-center text-xl"
+                      >
+                        -
+                      </button>
+                      <span className="text-gray-700 w-8 text-center">{device.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(device.id, 1)}
+                        className="text-gray-600 hover:text-gray-800 w-8 h-8 bg-gray-200 rounded-sm cursor-pointer flex items-center justify-center text-xl"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-3 py-2 sm:px-6 sm:py-4 text-center font-medium text-gray-700">
+                    {device.watts * device.quantity}W
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* Card-list for mobile */}
+          <div className="flex flex-col gap-4 md:hidden">
             {devices.map(device => (
-              <tr key={device.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-6 py-4 text-gray-700">{device.name}</td>
-                <td className="border border-gray-300 px-6 py-4 text-center text-gray-700">{device.watts}W</td>
-                <td className="border border-gray-300 px-6 py-4">
-                  <div className="flex items-center justify-center gap-4">
+              <div
+                key={device.id}
+                className="rounded border border-gray-200 bg-white flex flex-col px-3 py-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-gray-700">{device.name}</div>
+                  <span className="ml-2 font-semibold text-gray-700">{device.watts * device.quantity}W</span>
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                  <div>
+                    Usage: <span className="text-gray-700 font-medium">{device.watts}W</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(device.id, -1)}
-                      className="text-gray-600 hover:text-gray-800 bg-gray-200 rounded-sm cursor-pointer w-8 h-8 flex items-center justify-center text-xl"
+                      className="text-gray-600 hover:text-gray-800 bg-gray-200 rounded-sm cursor-pointer w-7 h-7 flex items-center justify-center text-base"
                     >
                       -
                     </button>
                     <span className="text-gray-700 w-8 text-center">{device.quantity}</span>
                     <button
                       onClick={() => updateQuantity(device.id, 1)}
-                      className="text-gray-600 hover:text-gray-800 w-8 h-8 bg-gray-200 rounded-sm cursor-pointer flex items-center justify-center text-xl"
+                      className="text-gray-600 hover:text-gray-800 w-7 h-7 bg-gray-200 rounded-sm cursor-pointer flex items-center justify-center text-base"
                     >
                       +
                     </button>
                   </div>
-                </td>
-                <td className="border border-gray-300 px-6 py-4 text-center font-medium text-gray-700">
-                  {device.watts * device.quantity}W
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
 
         <button
           onClick={() => setShowModal(true)}
-          className="px-8 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors font-medium"
+          className="px-8 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors font-medium w-full md:w-auto"
         >
           Add Device
         </button>
@@ -174,20 +211,20 @@ const SolarCalculator = () => {
 
       {/* Modal */}
       {showModal && (
-        <div 
+        <div
           className="fixed inset-0 flex items-center justify-center z-50"
-          style={{backgroundColor: "rgb(0 0 0 / 69%)"}}
+          style={{ backgroundColor: "rgb(0 0 0 / 69%)" }}
           onClick={closeModal}
         >
-          <div 
+          <div
             className="bg-white rounded-xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-8 py-6 border-b border-gray-200">
-              <h2 className="text-2xl font-semibold text-gray-900">Add Device</h2>
+            <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Add Device</h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 py-6">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6">
               <ul className="space-y-1">
                 {availableDevices.map((device, index) => (
                   <li key={index} className="flex items-center py-3 hover:bg-gray-50 cursor-pointer transition-colors">
@@ -209,7 +246,7 @@ const SolarCalculator = () => {
               </ul>
             </div>
 
-            <div className="px-8 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <div className="px-4 sm:px-8 py-4 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={closeModal}
                 className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
