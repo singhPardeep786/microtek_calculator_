@@ -25,6 +25,7 @@ const SolarCalculator = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState<Set<number>>(new Set());
+  const [showPlan, setShowPlan] = useState(false);
 
   const availableDevices: AvailableDevice[] = [
     { name: 'LED Bulb 5W', watts: 5 },
@@ -114,6 +115,34 @@ const SolarCalculator = () => {
     setSelectedDevices(new Set());
   };
 
+  const backupHours = 4; // default backup duration in hours
+  const systemVoltage = 12; // default system voltage in volts
+
+  const calculateVA = () => {
+    const totalWatts = calculateTotal();
+    // Common thumb rule: VA ≈ Watts × 1.41
+    return Math.round(totalWatts * 1.41);
+  };
+
+  const calculateRequiredAh = () => {
+    const totalWatts = calculateTotal();
+    // Ah = (Watts × backupHours) / (Voltage × efficiency)
+    const efficiency = 0.7;
+    return Math.round((totalWatts * backupHours) / (systemVoltage * efficiency));
+  };
+
+  const getRecommendedBatteryAh = (requiredAh: number) => {
+    // Standard commonly-available battery sizes (Ah)
+    const standardSizes = [40, 80, 100, 120, 150, 180, 200];
+    const found = standardSizes.find((size) => size >= requiredAh);
+    return found ?? requiredAh;
+  };
+
+  const handlePlanClick = () => {
+    // simply toggle visibility; values are always derived from current devices
+    setShowPlan(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8">
@@ -201,12 +230,39 @@ const SolarCalculator = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-8 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors font-medium w-full md:w-auto"
-        >
-          Add Device
-        </button>
+        <div className="flex flex-col gap-4 items-center">
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-8 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors font-medium w-full md:w-auto"
+          >
+            Add Device
+          </button>
+
+          <button
+            onClick={handlePlanClick}
+            className="px-10 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors font-medium w-full md:w-auto"
+          >
+            Lets Plan
+          </button>
+
+          {showPlan && (
+            <div className="mt-4 text-center text-gray-800 space-y-2">
+              <p className="text-lg font-semibold">
+                Total Capacity: {calculateVA()}VA, {calculateRequiredAh()}Ah
+              </p>
+              <p className="text-base">
+                1 x Inverter is required:{" "}
+                <span className="font-semibold">Minimum {calculateVA()}VA</span>
+              </p>
+              <p className="text-base">
+                1 x Battery is required:{" "}
+                <span className="font-semibold">
+                  Minimum {getRecommendedBatteryAh(calculateRequiredAh())}Ah
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal */}
